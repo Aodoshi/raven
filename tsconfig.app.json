@@ -15,6 +15,27 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "ignoreDeprecations": "6.0",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/app/*": ["src/app/*"],
+      "@/entities/*": ["src/entities/*"],
+      "@/features/*": ["src/features/*"],
+      "@/pages/*": ["src/pages/*"],
+      "@/shared/*": ["src/shared/*"],
+      "@/widgets/*": ["src/widgets/*"],
+      "@/hooks/*": ["src/hooks/*"],
+      "components/*": ["src/shared/ui/*"],
+      "components": ["src/shared/ui"],
+      "ui/*": ["src/shared/ui/*"],
+      "ui": ["src/shared/ui"],
+      "lib/*": ["src/shared/lib/*"],
+      "lib": ["src/shared/lib"],
+      "utils/*": ["src/shared/lib/utils/*"],
+      "utils": ["src/shared/lib/utils"],
+      "hooks": ["src/hooks"]
+    },
 
     /* Linting */
     "noUnusedLocals": true,
