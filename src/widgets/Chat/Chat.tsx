@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRoomStore } from "@/entities/room/model/roomStore";
 import { sendMessage } from "@/features/chat/api/chatSocket";
 import { Button } from "@/shared/ui/button";
-import { $api } from "@/shared/api/axios";
 import { sendTyping } from "@/features/chat/api/chatSocket";
 import { socket } from "@/shared/socket/socket";
-
-interface User {
-  id: number;
-  username: string;
-}
+import { MessageList } from "@/entities/message/ui/MessageList";
+import { getMe } from "@/entities/user/api/getMe";
 
 const stickers = [
   {
@@ -26,47 +22,58 @@ const stickers = [
   },
 ];
 
+interface User {
+  username: string;
+  id: string;
+}
+
 export const Chat = () => {
   const [text, setText] = useState("");
-  const [me, setMe] = useState<User>();
-  const [loading, setLoading] = useState(true);
   const [showStickers, setShowStickers] = useState(false);
   const [typingUser, setTypingUser] = useState("");
+  const [me, setMe] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const response = await $api.get("/me", {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        setMe(response.data);
+        const user = await getMe();
+        setMe(user);
       } catch (error) {
         console.error("Не удалось загрузить профиль", error);
-      } finally {
-        setLoading(false);
       }
     };
+
     fetchMe();
   }, []);
+
+  const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleTyping = ({ username }: { username: string }) => {
       setTypingUser(username);
 
-      setTimeout(() => {
+      if (typingTimeout.current) {
+        clearTimeout(typingTimeout.current);
+      }
+
+      typingTimeout.current = setTimeout(() => {
         setTypingUser("");
-      }, 1000);
+        typingTimeout.current = null;
+      }, 2000);
     };
 
     socket.on("user-typing", handleTyping);
 
     return () => {
       socket.off("user-typing", handleTyping);
+
+      if (typingTimeout.current) {
+        clearTimeout(typingTimeout.current);
+      }
     };
   }, []);
 
   const roomState = useRoomStore((state) => state.roomState);
-  const messages = roomState?.messages || [];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,10 +87,6 @@ export const Chat = () => {
     setShowStickers(false);
   };
 
-  if (loading) {
-    return <div className="container"> Загрузка... </div>;
-  }
-
   return (
     <div className="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-[#111113] shadow-xl">
       <div className="flex items-center justify-between border-b border-zinc-800/80 px-4 py-3">
@@ -95,36 +98,11 @@ export const Chat = () => {
         </div>
       </div>
       <div className="flex h-96 flex-col gap-3 overflow-y-auto px-4 py-4">
-        {messages.map((message) => {
-          const isOwnMessage = message.username === me?.username;
-          return (
-            <div
-              key={message.id}
-              className={`flex flex-col ${isOwnMessage ? "items-end" : "items-start"}`}
-            >
-              <strong className="mb-0.5 text-xs font-medium text-zinc-500">
-                {message.username}
-              </strong>
-              {message.type === "sticker" ? (
-                <div
-                  className={`rounded-xl p-1 ${isOwnMessage ? "bg-zinc-100/5" : "bg-zinc-900"}`}
-                >
-                  <img
-                    src={message.stickerUrl}
-                    alt={message.stickerId}
-                    className="h-28 w-28 object-contain rounded-xl"
-                  />
-                </div>
-              ) : (
-                <span
-                  className={`max-w-[85%] break-words rounded-lg px-3 py-2 text-sm ${isOwnMessage ? "bg-zinc-100 text-zinc-950" : "bg-zinc-900 text-zinc-200"}`}
-                >
-                  {message.text}
-                </span>
-              )}
-            </div>
-          );
-        })}
+        <MessageList currentUsername={me?.username} />
+
+        {typingUser && (
+          <p className="flex items-start">{typingUser} Печатает...</p>
+        )}
       </div>
       {showStickers && (
         <div className="border-t border-zinc-800/80 bg-[#0d0d0f] px-3 py-3">
@@ -167,11 +145,6 @@ export const Chat = () => {
           className="min-w-0 flex-1 rounded-lg bg-zinc-900 px-3.5 py-2.5 text-sm text-zinc-100 outline-none transition-colors placeholder:text-zinc-500 focus:bg-zinc-800"
         />
 
-        {typingUser && (
-          <div className="px-4 pb-2 text-xs text-zinc-500">
-            {console.log(typingUser)} печатает...
-          </div>
-        )}
         <Button
           type="submit"
           size="sm"
