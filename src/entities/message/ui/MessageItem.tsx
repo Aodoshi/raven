@@ -11,7 +11,7 @@ export const MessageItem = ({ message, currentUsername }: MessageItemProps) => {
     <div
       className={`flex flex-col ${isOwnMessage ? "items-end" : "items-start"}`}
     >
-      <strong className="mb-0.5 text-xs font-medium text-zinc-500">
+      <strong className="mb-0.5 text-xs font-medium text-zinc-500 mt-5">
         {message.username}
       </strong>
       {message.type === "sticker" ? (
