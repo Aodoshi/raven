@@ -5,16 +5,16 @@ import { sendTyping } from "@/features/chat/api/chatSocket";
 
 const stickers = [
   {
-    id: "aydana1",
-    url: "http://localhost:3001/stickers/aydana1.png",
+    id: "mem1",
+    url: "http://localhost:3001/stickers/alreadysixteen.jpg",
   },
   {
-    id: "aydana2",
-    url: "http://localhost:3001/stickers/aydana2.png",
+    id: "mem2",
+    url: "http://localhost:3001/stickers/dima.jpg",
   },
   {
-    id: "aydana3",
-    url: "http://localhost:3001/stickers/aydana3.png",
+    id: "mem3",
+    url: "http://localhost:3001/stickers/yosip.jpg",
   },
 ];
 

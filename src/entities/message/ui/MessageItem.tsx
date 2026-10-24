@@ -20,7 +20,6 @@ export const MessageItem = ({ message, currentUsername }: MessageItemProps) => {
         >
           <img
             src={message.stickerUrl}
-            alt={message.stickerId}
             className="h-28 w-28 object-contain rounded-xl"
           />
         </div>

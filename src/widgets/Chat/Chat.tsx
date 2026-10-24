@@ -4,6 +4,7 @@ import { socket } from "@/shared/socket/socket";
 import { MessageList } from "@/entities/message/ui/MessageList";
 import { getMe } from "@/entities/user/api/getMe";
 import { SendMessage } from "@/features/send-message/ui/SendMessage";
+import { Button } from "@/shared/ui/button";
 
 interface User {
   username: string;
@@ -13,6 +14,24 @@ interface User {
 export const Chat = () => {
   const [typingUser, setTypingUser] = useState("");
   const [me, setMe] = useState<User | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [showScrollDown, setShowScrollDown] = useState(false);
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+
+    setShowScrollDown(distanceFromBottom > 150);
+  };
+
+  const onScrollDown = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  };
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -66,11 +85,28 @@ export const Chat = () => {
           <p className="text-xs text-zinc-500">@{me?.username} </p>
         </div>
       </div>
-      <div className="flex h-96 flex-col gap-3 overflow-y-auto px-4 py-4">
-        <MessageList currentUsername={me?.username} />
 
-        {typingUser && (
-          <p className="flex items-start">{typingUser} Печатает...</p>
+      <div className="relative">
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex h-96 flex-col gap-3 overflow-y-auto px-4 py-4"
+        >
+          <MessageList currentUsername={me?.username} />
+
+          {typingUser && (
+            <p className="flex items-start">{typingUser} Печатает...</p>
+          )}
+        </div>
+
+        {showScrollDown && (
+          <Button
+            onClick={onScrollDown}
+            className="absolute bottom-3 right-6 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-100 shadow-lg transition hover:bg-zinc-700"
+            aria-label="Прокрутить вниз"
+          >
+            ↓
+          </Button>
         )}
       </div>
 
