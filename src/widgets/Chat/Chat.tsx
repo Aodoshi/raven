@@ -16,6 +16,10 @@ export const Chat = () => {
   const [me, setMe] = useState<User | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
+  const isBottom = useRef(true);
+  const roomState = useRoomStore((state) => state.roomState);
+
+  const messageCount = roomState?.messages?.length;
 
   const handleScroll = () => {
     const el = scrollRef.current;
@@ -23,6 +27,7 @@ export const Chat = () => {
 
     const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
 
+    isBottom.current = distanceFromBottom < 100;
     setShowScrollDown(distanceFromBottom > 150);
   };
 
@@ -45,6 +50,15 @@ export const Chat = () => {
 
     fetchMe();
   }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    if (isBottom.current) {
+      el.scrollTo({ top: el.scrollHeight });
+    }
+  }, [messageCount, typingUser]);
 
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -72,8 +86,6 @@ export const Chat = () => {
       }
     };
   }, []);
-
-  const roomState = useRoomStore((state) => state.roomState);
 
   return (
     <div className="flex w-full max-w-md flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-[#111113] shadow-xl">
