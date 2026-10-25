@@ -73,7 +73,7 @@ export const Chat = () => {
       typingTimeout.current = setTimeout(() => {
         setTypingUser("");
         typingTimeout.current = null;
-      }, 2000);
+      }, 1000);
     };
 
     socket.on("user-typing", handleTyping);
@@ -114,7 +114,7 @@ export const Chat = () => {
         {showScrollDown && (
           <Button
             onClick={onScrollDown}
-            className="absolute bottom-3 right-6 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-100 shadow-lg transition hover:bg-zinc-700"
+            className="absolute bottom-3 left-3 flex h-9 w-9 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-100 shadow-lg transition hover:bg-zinc-700"
             aria-label="Прокрутить вниз"
           >
             ↓

@@ -21,11 +21,7 @@ export const Player = () => {
   useEffect(() => {
     const fetchMe = async () => {
       try {
-        const response = await $api.get("/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+        const response = await $api.get("/me");
         setMe(response.data);
       } catch (error) {
         console.error("Не удалось загрузить профиль", error);
@@ -43,18 +39,20 @@ export const Player = () => {
       action: "play" | "pause" | "seek";
       currentTime: number;
     }) => {
-      console.log("RECEIVED:", action, currentTime);
+      const video = videoRef.current;
+      if (!video) return;
 
-      if (!videoRef.current) return;
-
-      videoRef.current.currentTime = currentTime;
+      const diff = Math.abs(video.currentTime - currentTime);
+      if (action !== "play" || diff > 0.5) {
+        video.currentTime = currentTime;
+      }
 
       if (action === "play") {
-        videoRef.current.play();
+        video.play().catch((error) => console.warn("браузер запретил", error));
       }
 
       if (action === "pause") {
-        videoRef.current.pause();
+        video.pause();
       }
     };
 
@@ -79,6 +77,10 @@ export const Player = () => {
           onPause={() => {
             if (!isOwner) return;
             sendMediaControl("pause", videoRef.current?.currentTime || 0);
+          }}
+          onSeeked={() => {
+            if (!isOwner) return;
+            sendMediaControl("seek", videoRef.current?.currentTime || 0);
           }}
         />
       </VideoSkin>
