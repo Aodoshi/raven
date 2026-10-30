@@ -16,7 +16,6 @@ export const Player = () => {
   const roomOwnerId = useRoomStore((state) => state.roomState?.ownerId);
   const [me, setMe] = useState<User>();
   const [joined, setJoined] = useState(false);
-
   const isOwner = me?.userId === roomOwnerId;
 
   useEffect(() => {

@@ -28,4 +28,5 @@ export interface Message {
   stickerUrl: string | undefined;
 
   created_at: string;
+  avatarUrl: string;
 }

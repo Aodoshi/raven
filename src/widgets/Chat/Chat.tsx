@@ -8,7 +8,8 @@ import { Button } from "@/shared/ui/button";
 
 interface User {
   username: string;
-  id: string;
+  userId: string;
+  avatarUrl: string;
 }
 
 export const Chat = () => {
@@ -104,7 +105,7 @@ export const Chat = () => {
           onScroll={handleScroll}
           className="flex h-96 flex-col gap-3 overflow-y-auto px-4 py-4"
         >
-          <MessageList currentUsername={me?.username} />
+          <MessageList me={me} />
 
           {typingUser && (
             <p className="flex items-start">{typingUser} Печатает...</p>
