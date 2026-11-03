@@ -13,6 +13,8 @@ export const Room = () => {
 
   const addMessage = useRoomStore((state) => state.addMessage);
 
+  const setVideoUrl = useRoomStore((state) => state.setVideoUrl);
+
   useEffect(() => {
     if (!id) return;
     const handleRoomState = (data: RoomState) => {
@@ -23,14 +25,22 @@ export const Room = () => {
       addMessage(message);
     };
 
+    const handleVideoChanged = ({ videoUrl }: { videoUrl: string }) => {
+      console.log(videoUrl);
+
+      setVideoUrl(videoUrl);
+    };
+
     socket.on("room-state", handleRoomState);
     socket.on("new-message", handleNewMessage);
+    socket.on("video-changed", handleVideoChanged);
 
     joinRoom(id);
 
     return () => {
       socket.off("room-state", handleRoomState);
       socket.off("new-message", handleNewMessage);
+      socket.off("video-changed", handleVideoChanged);
     };
   }, [id]);
 

@@ -4,13 +4,16 @@ import type { RoomState, Message } from "./types";
 
 interface RoomStore {
   roomState: RoomState | null;
+  videoUrl: string;
 
   setRoomState: (roomState: RoomState) => void;
   addMessage: (message: Message) => void;
+  setVideoUrl: (videoUrl: string) => void;
 }
 
 export const useRoomStore = create<RoomStore>((set) => ({
   roomState: null,
+  videoUrl: "",
 
   setRoomState: (roomState) => set({ roomState }),
 
@@ -25,4 +28,6 @@ export const useRoomStore = create<RoomStore>((set) => ({
         },
       };
     }),
+
+  setVideoUrl: (videoUrl) => set({ videoUrl }),
 }));

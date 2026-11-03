@@ -5,3 +5,9 @@ export const joinRoom = (roomId: string) => {
     roomId,
   });
 };
+
+export const changeVideoUrl = (videoUrl: string) => {
+  socket.emit("change-video", {
+    videoUrl,
+  });
+};

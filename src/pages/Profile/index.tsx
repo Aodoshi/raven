@@ -106,81 +106,172 @@ export const Profile = () => {
   const avatarSrc = me?.avatarUrl ? SERVER_URL + me.avatarUrl : null;
 
   return (
-    <div className="container">
-      <div className="flex items-center">
-        <h2 className="text-[48px]">Ваш профиль:</h2>
-        {!isEditing && (
-          <button className="underline" onClick={startEditing}>
-            Редактировать профиль
-          </button>
-        )}
-      </div>
-      <div className="mb-10 flex items-center gap-4">
-        <div className="w-20 h-20 bg-gray-300 rounded-full overflow-hidden flex items-center justify-center">
-          {avatarSrc ? (
-            <img
-              src={avatarSrc}
-              alt="avatar"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            me?.username[0].toUpperCase()
-          )}
+    <div className="px-5 py-12 text-[#f2f3f5]">
+      <div className="container">
+        <div className="mb-8">
+          <p className="mb-2 text-xs font-bold uppercase tracking-wider text-[#949ba4]">
+            Account settings
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Моя учётная запись
+          </h1>
+          <p className="mt-2 text-sm text-[#b5bac1]">
+            Управляйте информацией своего аккаунта.
+          </p>
         </div>
 
-        {isEditing && (
-          <>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              className="hidden"
-              onChange={handleAvatarChange}
-            />
-            <Button
-              disabled={uploading}
-              onClick={() => fileInputRef.current?.click()}
-            >
-              {uploading ? "Загрузка..." : "Сменить фото"}
-            </Button>
-          </>
-        )}
-      </div>
+        <div className="overflow-hidden rounded-lg bg-[#2b2d31]">
+          <div className="flex flex-wrap items-center justify-between gap-5 p-6">
+            <div className="flex items-center gap-5">
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-[28px] bg-[#404249]">
+                {avatarSrc ? (
+                  <img
+                    src={avatarSrc}
+                    alt="Аватар профиля"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-3xl font-bold text-[#b5bac1]">
+                    {me?.username?.[0]?.toUpperCase() ?? "?"}
+                  </div>
+                )}
+              </div>
 
-      <div className="mb-20">
-        <p>Ваш ник</p>
+              <div className="min-w-0">
+                <h2 className="truncate text-xl font-bold">
+                  {me?.username ?? "Пользователь"}
+                </h2>
+                <p className="mt-1 text-sm text-[#b5bac1]">
+                  Фото профиля и публичное имя
+                </p>
+              </div>
+            </div>
 
-        {isEditing ? (
-          <div>
-            <input
-              value={newUsername}
-              onChange={(e) => setNewUsername(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && saveUsername()}
-              maxLength={30}
-              autoFocus
-              className="border rounded px-3 py-2 text-[24px]"
-            />
-            <Button disabled={saving} onClick={saveUsername}>
-              {saving ? "Сохранение..." : "Сохранить"}
-            </Button>
-            <Button onClick={cancelEditing}>Отмена</Button>
+            {!isEditing && (
+              <Button
+                onClick={startEditing}
+                className="rounded-md bg-[#5865f2] px-4 py-2 text-sm font-medium text-white transition hover:bg-[#4752c4]"
+              >
+                Редактировать
+              </Button>
+            )}
+
+            {isEditing && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+                <Button
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-md bg-[#4e5058] px-4 py-2 text-sm text-white hover:bg-[#5d6069]"
+                >
+                  {uploading ? "Загрузка..." : "Изменить фото"}
+                </Button>
+              </>
+            )}
           </div>
-        ) : (
-          <h3 className="text-[24px]">@{me?.username}</h3>
-        )}
 
-        {error && <p className="text-red-500 mt-2">{error}</p>}
+          <div className="border-t border-[#3f4148] p-6">
+            <div className="mb-4">
+              <h3 className="text-sm font-bold uppercase text-[#b5bac1]">
+                Имя пользователя
+              </h3>
+              <p className="mt-1 text-xs text-[#949ba4]">
+                Ваш уникальный никнейм в системе.
+              </p>
+            </div>
+
+            {isEditing ? (
+              <div className="space-y-4">
+                <div className="flex items-center rounded-md bg-[#1e1f22] px-4 focus-within:ring-1 focus-within:ring-[#5865f2]">
+                  <span className="text-[#949ba4]">@</span>
+                  <input
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && saveUsername()}
+                    maxLength={30}
+                    autoFocus
+                    placeholder="Введите никнейм"
+                    className="w-full bg-transparent px-3 py-3 text-sm text-white outline-none placeholder:text-[#6d7078]"
+                  />
+                </div>
+
+                <p className="text-right text-xs text-[#949ba4]">
+                  {newUsername.length}/30
+                </p>
+
+                {error && (
+                  <p
+                    role="alert"
+                    className="rounded-md bg-[#da373c]/10 px-4 py-3 text-sm text-[#fa777c]"
+                  >
+                    {error}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    disabled={saving}
+                    onClick={saveUsername}
+                    className="rounded-md bg-[#5865f2] px-5 py-2.5 text-sm text-white hover:bg-[#4752c4]"
+                  >
+                    {saving ? "Сохранение..." : "Сохранить изменения"}
+                  </Button>
+
+                  <Button
+                    onClick={cancelEditing}
+                    className="rounded-md bg-[#4e5058] px-5 py-2.5 text-sm text-white hover:bg-[#5d6069]"
+                  >
+                    Отмена
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between rounded-md bg-[#1e1f22] px-4 py-3">
+                <span className="truncate text-sm font-medium">
+                  @{me?.username}
+                </span>
+                <span className="text-xs text-[#949ba4]">Username</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <h2 className="mb-4 text-sm font-bold uppercase text-[#b5bac1]">
+            Действия с аккаунтом
+          </h2>
+
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-[#da373c]/30 bg-[#2b2d31] p-5">
+            <div>
+              <h3 className="text-sm font-semibold">Завершить сеанс</h3>
+              <p className="mt-1 text-xs text-[#949ba4]">
+                Выйти из аккаунта на этом устройстве.
+              </p>
+            </div>
+
+            <Button
+              onClick={() => {
+                localStorage.removeItem("token");
+                alert("Вы вышли с аккаунта");
+                window.location.href = "/";
+              }}
+              className="rounded-md bg-[#da373c] px-4 py-2.5 text-sm text-white transition hover:bg-[#a1282d]"
+            >
+              Выйти из аккаунта
+            </Button>
+          </div>
+        </div>
+
+        <p className="mt-8 text-center text-xs text-[#6d7078]">
+          Настройки пользователя
+        </p>
       </div>
-
-      <Button
-        onClick={() => {
-          localStorage.removeItem("token");
-          alert("Вы вышли с аккаунта");
-          window.location.href = "/";
-        }}
-      >
-        Выйти с аккаунта
-      </Button>
     </div>
   );
 };

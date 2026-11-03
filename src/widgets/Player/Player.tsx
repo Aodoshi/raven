@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { socket } from "@/shared/socket/socket";
 import { useRoomStore } from "@/entities/room/model/roomStore";
 import { $api } from "@/shared/api/axios";
+import { changeVideoUrl } from "@/entities/room/api/roomSocket";
+import { Button } from "@/shared/ui/button";
 
 interface User {
   userId: number;
@@ -17,6 +19,9 @@ export const Player = () => {
   const [me, setMe] = useState<User>();
   const [joined, setJoined] = useState(false);
   const isOwner = me?.userId === roomOwnerId;
+  const videoUrl = useRoomStore((state) => state.videoUrl);
+  const [link, setLink] = useState<string>("");
+  const [linkError, setLinkError] = useState<string>("");
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -94,9 +99,10 @@ export const Player = () => {
 
   const video = (
     <Video
+      key={videoUrl}
       className="rounded-2xl"
       ref={videoRef}
-      src="https://stream.mux.com/BV3YZtogl89mg9VcNBhhnHm02Y34zI1nlMuMQfAbl3dM/highest.mp4"
+      src={videoUrl}
       playsInline
       onPlay={() => {
         if (!isOwner) return;
@@ -113,6 +119,21 @@ export const Player = () => {
     />
   );
 
+  const handleChangeVideoUrl = () => {
+    try {
+      const url = new URL(link.trim());
+
+      if (!url.protocol.startsWith("http") && !url.protocol.startsWith("https"))
+        throw new Error("Неверный протокол");
+
+      changeVideoUrl(url.href);
+      setLink("");
+      setLinkError("");
+    } catch {
+      setLinkError("Неверная ссылка на видео");
+    }
+  };
+
   if (!me) return null;
 
   return (
@@ -120,10 +141,24 @@ export const Player = () => {
       ref={containerRef}
       className="relative w-full rounded-2xl overflow-hidden group shadow-2xl bg-black/40 border border-white/10 backdrop-blur-xl"
     >
-      <div className="w-full">
+      <div className="w-full rounded-2xl ">
         <VideoPlayer>
           {isOwner ? <VideoSkin>{video}</VideoSkin> : video}
         </VideoPlayer>
+        {isOwner && (
+          <div>
+            <input
+              placeholder="Вставьте ссылку на видео"
+              type="text"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              className="mt-4 px-4 py-2 bg-black/50 text-white placeholder:text-white/50 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <Button onClick={handleChangeVideoUrl}>Сменить</Button>
+            {linkError && <p>{linkError}</p>}
+          </div>
+        )}
       </div>
 
       {me && !isOwner && !joined && (
