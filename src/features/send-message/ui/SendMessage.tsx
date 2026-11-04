@@ -1,20 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { sendMessage, sendTyping } from "@/features/chat/api/chatSocket";
 import { Button } from "@/shared/ui/button";
-import addSticker from "@/shared/assets/free-icon-edit-1159633.png";
-import { $api } from "@/shared/api/axios";
-
-interface sticker {
-  id: string;
-  url: string;
-}
+import { StickerPick } from "./StickerPick";
 
 export const SendMessage = () => {
   const [text, setText] = useState("");
-  const [showStickers, setShowStickers] = useState(false);
-  const stickerUploadRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState<string>("");
-  const [stickers, setStickers] = useState<sticker[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,95 +13,15 @@ export const SendMessage = () => {
     setText("");
   };
 
-  const handleStickerClick = (stickerId: string) => {
-    sendMessage({ type: "sticker", stickerId });
-    setShowStickers(false);
-  };
-
-  useEffect(() => {
-    $api
-      .get("/stickers")
-      .then(({ data }) => setStickers(data))
-      .catch(() => setError("couldn't load stickers"));
-  }, []);
-
-  const handleUploadSticker = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = e.target?.files?.[0];
-
-    if (!file) return;
-
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      return setError("need jpg, png or webp");
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      return setError("max is 2mb");
-    }
-
-    const form = new FormData();
-    form.append("sticker", file);
-
-    setError("");
-
-    try {
-      const { data } = await $api.post("/stickers", form);
-      setStickers((prev) => [...prev, data.data]);
-    } catch {
-      setError("error on loading sticker, something went wrong");
-    }
-  };
-
   return (
     <div>
-      {showStickers && (
-        <div className="border-t border-zinc-800/80 bg-[#0d0d0f] px-3 py-3">
-          <div className="flex flex-wrap gap-2 overflow-x-auto">
-            <input
-              ref={stickerUploadRef}
-              className="hidden"
-              type="file"
-              id="sticker-upload"
-              onChange={handleUploadSticker}
-            />
-
-            <button
-              onClick={() => stickerUploadRef.current?.click()}
-              className="cursor-pointer w-24 h-24 flex items-center justify-center"
-            >
-              <img className="w-10 h-10" src={addSticker} alt="add sticker" />
-
-              {error && <p>{error}</p>}
-            </button>
-            {stickers.map((sticker) => (
-              <button
-                key={sticker.id}
-                type="button"
-                onClick={() => handleStickerClick(sticker.id)}
-                className="cursor-pointer w-24 h-24 rounded-xl border border-zinc-800/80 p-1 transition-colors hover:bg-zinc-800/20"
-              >
-                <img
-                  src={sticker.url}
-                  alt={sticker.id}
-                  className="h-full w-full object-contain rounded-xl"
-                />
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
       <form
         onSubmit={handleSubmit}
         className="flex items-center gap-2 border-t border-zinc-800/80 p-3"
       >
-        <button
-          type="button"
-          onClick={() => setShowStickers((prev) => !prev)}
-          className="flex cursor-pointer h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
-        >
-          ☺
-        </button>
+        <StickerPick
+          onSelect={(id) => sendMessage({ type: "sticker", stickerId: id })}
+        />
         <input
           value={text}
           onChange={(e) => {
