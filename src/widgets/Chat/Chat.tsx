@@ -13,8 +13,8 @@ interface User {
 }
 
 export const Chat = () => {
-  const [typingUser, setTypingUser] = useState("");
   const [me, setMe] = useState<User | null>(null);
+  const [typingUser, setTypingUser] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const isBottom = useRef(true);
@@ -62,6 +62,14 @@ export const Chat = () => {
   }, [messageCount, typingUser]);
 
   const typingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+      typingTimeout.current = null;
+    }
+    setTypingUser("");
+  }, [messageCount]);
 
   useEffect(() => {
     const handleTyping = ({ username }: { username: string }) => {
