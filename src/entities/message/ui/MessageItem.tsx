@@ -14,7 +14,7 @@ interface MessageItemProps {
 export const MessageItem = ({ message, me }: MessageItemProps) => {
   const isOwnMessage = message.username === me?.username;
 
-  const SERVER_URL = "http://localhost:3001";
+  const SERVER_URL = import.meta.env.VITE_API_URL;
 
   const avatarSrc = message?.avatarUrl ? SERVER_URL + message.avatarUrl : null;
 

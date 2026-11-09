@@ -101,9 +101,7 @@ export const Profile = () => {
 
   if (loading) return <div>Загрузка...</div>;
 
-  const SERVER_URL = "http://localhost:3001";
-
-  const avatarSrc = me?.avatarUrl ? SERVER_URL + me.avatarUrl : null;
+  const avatarSrc = `${import.meta.env.VITE_API_URL.replace(/\/$/, "")}${me?.avatarUrl}`;
 
   return (
     <div className="px-5 py-12 text-[#f2f3f5]">

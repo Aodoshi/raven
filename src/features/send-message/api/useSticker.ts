@@ -18,6 +18,8 @@ export const useSticker = () => {
   ) => {
     const file = e.target?.files?.[0];
 
+    e.target.value = "";
+
     if (!file) return;
 
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {

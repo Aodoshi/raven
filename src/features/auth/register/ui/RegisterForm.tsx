@@ -23,7 +23,7 @@ export const RegisterForm = () => {
 
   const onSubmit = async (data: registerFormValues) => {
     try {
-      const result = await registerUser(data);
+      await registerUser(data);
       navigate("/");
       alert("Регистрация прошла успешно, теперь залогиньтесь");
     } catch (error) {
