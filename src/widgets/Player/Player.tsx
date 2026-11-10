@@ -201,7 +201,7 @@ export const Player = () => {
   const video = (
     <Video
       key={videoUrl}
-      className="rounded-2xl"
+      className="w-full h-full rounded-2xl"
       ref={videoRef}
       src={videoUrl}
       playsInline
@@ -255,9 +255,11 @@ export const Player = () => {
             />
           </div>
         ) : (
-          <VideoPlayer>
-            {isOwner ? <VideoSkin>{video}</VideoSkin> : video}
-          </VideoPlayer>
+          <div className="aspect-video w-full">
+            <VideoPlayer>
+              {isOwner ? <VideoSkin>{video}</VideoSkin> : video}
+            </VideoPlayer>
+          </div>
         )}
 
         {isOwner && (
